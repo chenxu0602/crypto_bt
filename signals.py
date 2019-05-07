@@ -8,6 +8,33 @@ from data import load_symbol
 
 from typing import Dict
 
+import abc
+
+class Signal(pd.DataFrame, abc.ABC):
+    def __init__(self, params : Dict[str, int],  dataParams : Dict[str, str], logger : logging = None):
+        super().__init__()
+
+        if logger is None:
+            logger = setup_ogger("Singal_Logger")
+
+        try:
+            self["signal"] = 0.0
+        except KeyError as e:
+            logger.error(f"Couldn't initialize signal {e} ...")
+
+    def nrows(self):
+        return len(self)
+
+    def period(self):
+        start, end = None, None
+        if not self.empty():
+            return self.index[0], self.index[-1]
+
+    @abc.abstractmethod
+    def calc_signal(self):
+        pass
+
+
 def mavg_cr(params : Dict[str, int],  dataParams : Dict[str, str], logger : logging = None) -> pd.DataFrame:
     """ Moving Average Cross Strategy """
     """ params.S : short period """
@@ -50,4 +77,7 @@ if __name__ == "__main__":
     data_pars = {"exch" : "binance", "sym" : "ADAUSDT", "freq" : "1h", "resample_to" : "1h"}
     df = mavg_cr(pars, data_pars)
 
-    print(df.head(20))
+#    print(df.head(20))
+
+    sig = Signal()
+    print(sig)
